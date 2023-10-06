@@ -2195,7 +2195,7 @@ were merged in from a previous call to `persp-merge'."
       "Toggle current view to buffers with persp name QUALIFIER."
     (:description "persp-name"
                   :reader (read-regexp "Filter by persp name (regexp): "))
-    (ibuffer-awhen (persp-ibuffer-name buf)
+    (when-let (persp-ibuffer-name buf)
       (if (stringp qualifier)
           (or (string-match-p qualifier (car it))
               (string-match-p qualifier (cdr-safe it)))
