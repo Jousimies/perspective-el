@@ -7,7 +7,7 @@
 ;; Author: Natalie Weizenbaum <nex342@gmail.com>
 ;; URL: http://github.com/nex3/perspective-el
 ;; Package-Requires: ((emacs "24.4") (cl-lib "0.5"))
-;; Version: 2.18
+;; Version: 2.19
 ;; Created: 2008-03-05
 ;; By: Natalie Weizenbaum <nex342@gmail.com>
 ;; Keywords: workspace, convenience, frames
@@ -1605,6 +1605,19 @@ PERSP-SET-IDO-BUFFERS)."
                        (buffer-name (current-buffer))))))
   (kill-buffer buffer-or-name))
 
+;; Buffer killing integration: kill all buffers in the current perspective
+;; except the current one and the perspective's scratch buffer.
+;;;###autoload
+(defun persp-kill-other-buffers ()
+  "Kill all buffers in the current perspective other than the current one.
+Also excludes the perspective's scratch buffer."
+  (interactive)
+  (when (y-or-n-p "Are you sure you want to kill all buffers in the current perspective except the current buffer? ")
+    (cl-loop for buf in (persp-current-buffers)
+             unless (or (eq buf (current-buffer))
+                        (eq buf (get-buffer (persp-scratch-buffer))))
+             do (kill-buffer buf))))
+
 ;; Buffer switching integration: buffer-menu.
 ;;;###autoload
 (defun persp-buffer-menu (arg)
@@ -2215,6 +2228,8 @@ were merged in from a previous call to `persp-merge'."
 ;;;###autoload
 (defun persp-ibuffer-generate-filter-groups ()
   "Create a set of ibuffer filter groups based on the persp name of buffers."
+  (unless (featurep 'ibuf-ext)
+    (require 'ibuf-ext))
   (declare-function ibuffer-remove-duplicates "ibuf-ext.el")
   (declare-function ibuffer-push-filter "ibuf-ext.el")
   (declare-function ibuffer-pop-filter "ibuf-ext.el")
